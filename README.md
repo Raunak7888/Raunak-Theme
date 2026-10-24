@@ -1,8 +1,8 @@
-# Raunak's Theme
+# Raunak Noir
 
 A modern, minimal theme for [Obsidian](https://obsidian.md), inspired by Vercel's design language: pure black and cloud white, a single accent color, rounded corners, small-caps headings and soft, subtle motion.
 
-<img src="Raunak's Theme\screenshot.png" alt="Raunak's Theme in dark mode" width="100%">
+<img src="screenshot.png" alt="Raunak Noir in dark mode" width="100%">
 
 ## Features
 
@@ -25,14 +25,14 @@ A modern, minimal theme for [Obsidian](https://obsidian.md), inspired by Vercel'
 
 1. Open **Settings → Appearance**.
 2. Under **Themes**, click **Manage**.
-3. Search for **Raunak's Theme** and click **Install and use**.
+3. Search for **Raunak Noir** and click **Install and use**.
 
 ### Manual installation
 
 1. Download `theme.css` and `manifest.json` from the [latest release](https://github.com/Raunak7888/Raunak-Theme/releases/latest).
-2. In your vault, create the folder `.obsidian/themes/Raunak's Theme/`.
+2. In your vault, create the folder `.obsidian/themes/Raunak Noir/`.
 3. Put both files in that folder.
-4. Open **Settings → Appearance**, click the refresh icon next to **Themes**, and choose **Raunak's Theme**.
+4. Open **Settings → Appearance**, click the refresh icon next to **Themes**, and choose **Raunak Noir**.
 
 ## Fonts
 
