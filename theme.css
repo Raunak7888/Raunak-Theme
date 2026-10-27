@@ -16,8 +16,7 @@
                               13. Animations
    ===================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Noto+Sans+Math&display=swap');
 /* =====================================================================
    1. THEME KNOBS — edit these
    ===================================================================== */
@@ -513,26 +512,112 @@ mark, .cm-highlight { border-radius: 4px; padding: 0.05em 0.3em; color: var(--te
 .markdown-source-view.mod-cm6 .HyperMD-list-line .cm-formatting-list { color: var(--text-accent) !important; }
 .markdown-source-view.mod-cm6 .cm-formatting-list-ul .list-bullet::after { background-color: var(--text-accent); }
 
-/* Task checkboxes */
-input[type='checkbox'] {
-  transition: background-color var(--nc-fast), border-color var(--nc-fast), box-shadow var(--nc-fast);
+/* Task checkboxes — six states, each with its own colour and icon */
+body {
+  --nc-ic-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+  --nc-ic-bang:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5.5v8M12 18.5h.01'/%3E%3C/svg%3E");
+  --nc-ic-ask:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8.8 9.2a3.3 3.3 0 1 1 4.8 3c-1 .6-1.6 1.2-1.6 2.5M12 18.8h.01'/%3E%3C/svg%3E");
+  --nc-ic-fwd:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 12h13M13 6.5l5.5 5.5-5.5 5.5'/%3E%3C/svg%3E");
+  --nc-ic-no:    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M6.5 12h11'/%3E%3C/svg%3E");
 }
-input[type='checkbox']:hover { box-shadow: 0 0 0 3px var(--nc-glow); }
-.markdown-rendered ul > li.task-list-item.is-checked,
-.markdown-source-view.mod-cm6 .HyperMD-task-line[data-task='x'],
-.markdown-source-view.mod-cm6 .HyperMD-task-line[data-task='X'] {
+.theme-dark {
+  --tk-done: #34d399;  --tk-bang: #ff5c6c;  --tk-ask: #fbbf24;
+  --tk-fwd:  #a78bfa;  --tk-no:   #8f8f8f;  --tk-ink: #050505;
+}
+.theme-light {
+  --tk-done: #16a34a;  --tk-bang: #e11d48;  --tk-ask: #d97706;
+  --tk-fwd:  #7c3aed;  --tk-no:   #98a1ae;  --tk-ink: #ffffff;
+}
+
+/* Each state sets a colour and an icon. Children inherit them. */
+[data-task='x'], [data-task='X'] { --tk: var(--tk-done); --tk-icon: var(--nc-ic-check); }
+[data-task='!'] { --tk: var(--tk-bang); --tk-icon: var(--nc-ic-bang); }
+[data-task='?'] { --tk: var(--tk-ask);  --tk-icon: var(--nc-ic-ask); }
+[data-task='>'] { --tk: var(--tk-fwd);  --tk-icon: var(--nc-ic-fwd); }
+[data-task='-'] { --tk: var(--tk-no);   --tk-icon: var(--nc-ic-no); }
+
+/* To do: empty ring that lights up on hover */
+input.task-list-item-checkbox {
+  transition: background-color var(--nc-fast), border-color var(--nc-fast), box-shadow var(--nc-med) var(--nc-ease);
+}
+input.task-list-item-checkbox:not(:checked) {
+  background-color: transparent;
+  border: 1.5px solid var(--checkbox-border-color);
+}
+input.task-list-item-checkbox:not(:checked):hover {
+  border-color: var(--text-accent);
+  box-shadow: 0 0 0 3px var(--nc-glow);
+}
+
+/* Every other state: filled box, soft ring, custom icon */
+input.task-list-item-checkbox:checked {
+  --checkbox-color: var(--tk, var(--interactive-accent));
+  --checkbox-color-hover: var(--tk, var(--interactive-accent-hover));
+  --checkbox-marker-color: var(--tk-ink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tk, var(--interactive-accent)) 20%, transparent);
+}
+input.task-list-item-checkbox:checked::after {
+  -webkit-mask-image: var(--tk-icon, var(--nc-ic-check));
+  mask-image: var(--tk-icon, var(--nc-ic-check));
+  -webkit-mask-size: 74%;
+  mask-size: 74%;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/* Text styles. Works in Reading view and Live Preview. */
+:is(li, .HyperMD-task-line):is([data-task='!'], [data-task='?'], [data-task='>']) {
+  text-decoration: none;
+}
+.markdown-rendered li.task-list-item:not([data-task=' ']) {
+  border-radius: var(--radius-s);
+  padding-inline: 0.4em;
+  transition: background-color var(--nc-med) var(--nc-ease), color var(--nc-med);
+}
+
+/* [x] Done: calm, with a soft green strike */
+:is(li, .HyperMD-task-line):is([data-task='x'], [data-task='X']) {
   color: var(--text-faint);
-  transition: color var(--nc-med);
-}
-.markdown-rendered ul > li.task-list-item.is-checked {
   text-decoration: line-through;
-  text-decoration-color: var(--text-faint);
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: color-mix(in srgb, var(--tk-done) 55%, transparent);
 }
-/* Extra task states: [!] [?] [>] [-] */
-.markdown-rendered li[data-task='!'], .HyperMD-task-line[data-task='!'] { color: #f87171; }
-.markdown-rendered li[data-task='?'], .HyperMD-task-line[data-task='?'] { color: #fbbf24; }
-.markdown-rendered li[data-task='>'], .HyperMD-task-line[data-task='>'] { color: var(--text-accent); }
-.markdown-rendered li[data-task='-'], .HyperMD-task-line[data-task='-'] { color: var(--text-faint); text-decoration: line-through; }
+
+/* [!] Important: bold, with a red glow from the left */
+:is(li, .HyperMD-task-line)[data-task='!'] {
+  color: var(--text-normal);
+  font-weight: 600;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tk-bang) 16%, transparent), transparent 75%);
+  border-radius: var(--radius-s);
+}
+
+/* [?] Question: amber dotted underline */
+:is(li, .HyperMD-task-line)[data-task='?'] {
+  color: var(--text-normal);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tk-ask) 13%, transparent), transparent 70%);
+  border-radius: var(--radius-s);
+  text-decoration: underline dotted color-mix(in srgb, var(--tk-ask) 80%, transparent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.25em;
+}
+
+/* [>] Forwarded: muted text, violet tint */
+:is(li, .HyperMD-task-line)[data-task='>'] {
+  color: var(--text-muted);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tk-fwd) 14%, transparent), transparent 70%);
+  border-radius: var(--radius-s);
+}
+
+/* [-] Cancelled: faded, italic, grey strike */
+:is(li, .HyperMD-task-line)[data-task='-'] {
+  color: var(--text-faint);
+  font-style: italic;
+  opacity: 0.65;
+  text-decoration: line-through;
+  text-decoration-color: var(--tk-no);
+}
 
 /* Blockquote: the whole quote is a tinted card with a big quote mark */
 .markdown-rendered blockquote {
@@ -751,6 +836,107 @@ kbd {
   transition: opacity var(--nc-fast), transform var(--nc-fast) var(--nc-ease);
 }
 pre:hover .copy-code-button { opacity: 1; transform: none; }
+
+/* =====================================================================
+   8b. MATH — Noto Sans Math, with Windows-safe fallbacks
+   ===================================================================== */
+
+body {
+  --font-math-theme: 'Noto Sans Math', 'Cambria Math', 'STIX Two Math', 'Latin Modern Math', 'Segoe UI Symbol', serif;
+}
+
+/* Block math ($$ ... $$) and inline math ($ ... $), rendered */
+.math,
+.math-block,
+mjx-container,
+mjx-container mjx-math,
+mjx-container mjx-c,
+mjx-container mjx-c::before,
+mjx-container mjx-utext {
+  font-family: var(--font-math-theme) !important;
+}
+
+mjx-container,
+mjx-container mjx-math,
+mjx-container mjx-mrow,
+mjx-container mjx-c,
+mjx-container mjx-mfrac,
+mjx-container mjx-mn,
+mjx-container mjx-mi,
+mjx-container mjx-mo {
+  overflow: visible !important;
+}
+
+
+
+/* Give the math room so nothing gets cut */
+mjx-container[display='true'],
+.math.math-block {
+  /*padding-block: 0.9em 1em !important;*/
+  overflow: visible !important;
+}
+
+mjx-container[display='true'] mjx-math {
+  overflow: visible !important;
+}
+
+/* Inline math too */
+mjx-container:not([display='true']) {
+  overflow: visible !important;
+}
+
+/* The raw LaTeX text while editing */
+.cm-math,
+.cm-s-obsidian span.cm-math {
+  font-family: var(--font-math-theme) !important;
+}
+/* Block math: left aligned, with a ⟹ arrow in front */
+mjx-container[display='true'],
+.math.math-block {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 1em;
+  text-align: left !important;
+  margin: 1em 0 !important;
+}
+
+mjx-container[display='true'] mjx-math {
+  margin-left: 0 ;
+  text-align: left;
+}
+
+mjx-container[display='true']::before {
+  content: '\27F9';
+  flex: none;
+  font-family: var(--font-math-theme);
+  font-size: 1.4em;
+  line-height: 1;
+  color: var(--text-accent);
+  opacity: 0.85;
+}
+
+/* Restore MathJax's own glyph metrics, but keep Noto as the font */
+mjx-container[jax='CHTML'] {
+  line-height: 0 !important;
+}
+
+mjx-container[jax='CHTML'] mjx-c::before {
+  line-height: normal !important;
+  overflow: visible !important;
+}
+
+/* Nothing inside math may clip */
+mjx-container,
+mjx-container * {
+  overflow: visible !important;
+  clip-path: none !important;
+}
+
+/* Gentle room for block math only */
+mjx-container[display='true'] {
+  padding-block: 0.4em !important;
+}
 
 /* =====================================================================
    9. CALLOUTS & PROPERTIES
