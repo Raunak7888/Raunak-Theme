@@ -1,8 +1,9 @@
 /* =====================================================================
-   RAUNAK NOIR  v1.0.1  —  a modern, Vercel-inspired Obsidian theme
+   RAUNAK NOIR  v1.0.2  —  a modern, Vercel-inspired Obsidian theme
    Black + cloud white, one accent, rounded corners, small-caps headings.
 
    Fonts      Text & UI: Alan Sans · Code: JetBrains Mono
+              Math: Cambria Math (ships with Windows)
    Motion     Soft, short, subtle. Fully disabled for reduced-motion users.
 
    Sections
@@ -10,13 +11,12 @@
      2. Shared variables       7. Body content
      3. Dark palette           8. Code
      4. Light palette          9. Callouts & properties
-     5. Base & fonts          10. Workspace chrome
-                              11. Forms: dropdowns, inputs, buttons…
-                              12. Overlays: modals, menus, popovers
-                              13. Animations
+     5. Base & fonts          8b. Math
+     10. Workspace chrome     11. Forms: dropdowns, inputs, buttons…
+     12. Overlays: modals, menus, popovers          13. Animations
    ===================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Noto+Sans+Math&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 /* =====================================================================
    1. THEME KNOBS — edit these
    ===================================================================== */
@@ -838,105 +838,247 @@ kbd {
 pre:hover .copy-code-button { opacity: 1; transform: none; }
 
 /* =====================================================================
-   8b. MATH — Noto Sans Math, with Windows-safe fallbacks
+   8b. MATH — Cambria Math · card blocks · soft inline pills
+   ---------------------------------------------------------------------
+   Font     Cambria Math (ships with Windows). Serif, upright-leaning
+            italics, not script-like, and clearly different from the
+            Alan Sans body text. Fallbacks cover macOS / Linux.
+   Blocks   $$ … $$  → a card with an arrow gutter. Wide equations scroll
+            inside the card instead of spilling out.
+   Inline   $ … $    → a soft tinted pill.
    ===================================================================== */
 
-body {
-  --font-math-theme: 'Noto Sans Math', 'Cambria Math', 'STIX Two Math', 'Latin Modern Math', 'Segoe UI Symbol', serif;
+/* Zero-metric alias of Cambria Math. MathJax lays glyph boxes out assuming
+   the font has no ascent/descent (it normally ships its own "MJXZERO" font
+   for that). Zeroing them here keeps every glyph sitting on its baseline
+   and keeps fractions and scripts tight, with no extra line-height hacks. */
+@font-face {
+  font-family: 'NC Math';
+  src: local('Cambria Math'), local('CambriaMath'),
+       local('STIX Two Math'), local('Latin Modern Math');
+  ascent-override: 0%;
+  descent-override: 0%;
+  line-gap-override: 0%;
 }
 
-/* Block math ($$ ... $$) and inline math ($ ... $), rendered */
-.math,
-.math-block,
-mjx-container,
-mjx-container mjx-math,
+/* ---- Math knobs — edit these ---- */
+body {
+  --font-math-theme: 'NC Math', 'Cambria Math', 'STIX Two Math', 'Latin Modern Math',
+                     'Segoe UI Symbol', 'Times New Roman', serif;
+  --nc-math-font: MJXZERO, var(--font-math-theme);
+
+  --nc-math-gutter: 2.8em;          /* width of the arrow gutter            */
+  --nc-math-pad-y: 0.45em;          /* vertical breathing room in a block   */
+  --nc-math-block-size: 1.1em;      /* size of block math vs. body text     */
+  --nc-math-inline-size: 1.04em;    /* size of inline math vs. body text    */
+  --nc-math-radius: var(--radius-l);
+  --nc-math-surface: var(--background-primary-alt);
+
+  /* Arrow icon (double shaft, like ⟹) — drawn as a mask so it follows the accent */
+  --nc-ic-math-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 9.5h14M3.5 14.5h14M13 5l7 7-7 7'/%3E%3C/svg%3E");
+}
+body.is-mobile { --nc-math-gutter: 2.3em; }
+
+.theme-dark {
+  --nc-math-tint: hsla(var(--accent-h), var(--accent-s), 55%, 0.10);
+  --nc-math-rule: hsla(var(--accent-h), var(--accent-s), 55%, 0.24);
+  --nc-math-pill: hsla(var(--accent-h), var(--accent-s), 55%, 0.10);
+  --nc-math-pill-hover: hsla(var(--accent-h), var(--accent-s), 55%, 0.18);
+  --nc-math-ring: hsla(var(--accent-h), var(--accent-s), 55%, 0.20);
+  --nc-math-ring-hover: hsla(var(--accent-h), var(--accent-s), 60%, 0.50);
+  --nc-math-fade: rgba(0, 0, 0, 0.6);
+}
+.theme-light {
+  --nc-math-tint: hsla(var(--accent-h), var(--accent-s), 50%, 0.08);
+  --nc-math-rule: hsla(var(--accent-h), var(--accent-s), 50%, 0.22);
+  --nc-math-pill: hsla(var(--accent-h), var(--accent-s), 50%, 0.08);
+  --nc-math-pill-hover: hsla(var(--accent-h), var(--accent-s), 50%, 0.15);
+  --nc-math-ring: hsla(var(--accent-h), var(--accent-s), 50%, 0.22);
+  --nc-math-ring-hover: hsla(var(--accent-h), var(--accent-s), 45%, 0.50);
+  --nc-math-fade: rgba(10, 20, 40, 0.18);
+}
+
+/* Inside callouts and quotes the card turns see-through so tints don't stack */
+.callout,
+.markdown-rendered blockquote {
+  --nc-math-surface: color-mix(in srgb, var(--background-primary) 55%, transparent);
+}
+
+/* ---- Font: glyphs only. Metrics come from the zero-metric font. ---- */
 mjx-container mjx-c,
 mjx-container mjx-c::before,
 mjx-container mjx-utext {
-  font-family: var(--font-math-theme) !important;
+  font-family: var(--nc-math-font) !important;
 }
 
-mjx-container,
-mjx-container mjx-math,
-mjx-container mjx-mrow,
-mjx-container mjx-c,
-mjx-container mjx-mfrac,
-mjx-container mjx-mn,
-mjx-container mjx-mi,
-mjx-container mjx-mo {
-  overflow: visible !important;
+/* Keep theme typography (small-caps headings, ligatures, gradient titles)
+   from leaking into equations */
+mjx-container {
+  font-feature-settings: normal;
+  font-variant-ligatures: none;
+  font-variant-caps: normal;
+  letter-spacing: normal;
+  text-transform: none;
+  -webkit-text-fill-color: currentColor;
 }
 
-
-
-/* Give the math room so nothing gets cut */
-mjx-container[display='true'],
-.math.math-block {
-  /*padding-block: 0.9em 1em !important;*/
-  overflow: visible !important;
-}
-
-mjx-container[display='true'] mjx-math {
-  overflow: visible !important;
-}
-
-/* Inline math too */
-mjx-container:not([display='true']) {
-  overflow: visible !important;
-}
-
-/* The raw LaTeX text while editing */
-.cm-math,
-.cm-s-obsidian span.cm-math {
-  font-family: var(--font-math-theme) !important;
-}
-/* Block math: left aligned, with a ⟹ arrow in front */
-mjx-container[display='true'],
-.math.math-block {
-  display: flex !important;
-  align-items: center;
-  justify-content: flex-start !important;
-  gap: 1em;
-  text-align: left !important;
-  margin: 1em 0 !important;
-}
-
-mjx-container[display='true'] mjx-math {
-  margin-left: 0 ;
-  text-align: left;
-}
-
-mjx-container[display='true']::before {
-  content: '\27F9';
-  flex: none;
-  font-family: var(--font-math-theme);
-  font-size: 1.4em;
-  line-height: 1;
-  color: var(--text-accent);
-  opacity: 0.85;
-}
-
-/* Restore MathJax's own glyph metrics, but keep Noto as the font */
-mjx-container[jax='CHTML'] {
-  line-height: 0 !important;
-}
-
-mjx-container[jax='CHTML'] mjx-c::before {
-  line-height: normal !important;
-  overflow: visible !important;
-}
-
-/* Nothing inside math may clip */
+/* Nothing inside math may clip (the block scroller below is the one exception) */
 mjx-container,
 mjx-container * {
   overflow: visible !important;
   clip-path: none !important;
 }
+mjx-container[jax='CHTML'] { line-height: 0; }
 
-/* Gentle room for block math only */
-mjx-container[display='true'] {
-  padding-block: 0.4em !important;
+/* ---------------------------------------------------------------------
+   BLOCK MATH — card with an arrow gutter
+   --------------------------------------------------------------------- */
+.math.math-block {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
+
+/* Obsidian draws its own outline around the whole math widget in Live Preview,
+   which showed up as a second frame around the card. Turn it off. */
+.markdown-source-view.mod-cm6 .cm-embed-block.math,
+.markdown-source-view.mod-cm6 .cm-embed-block.math:hover {
+  box-shadow: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+mjx-container[display='true'] {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  box-sizing: border-box;
+  margin: 0.8em 0 !important;
+  padding: var(--nc-math-pad-y) 1em var(--nc-math-pad-y) calc(var(--nc-math-gutter) + 0.45em) !important;
+  font-size: var(--nc-math-block-size);
+  text-align: left !important;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--nc-math-radius);
+  background:
+    linear-gradient(var(--nc-math-rule), var(--nc-math-rule)) var(--nc-math-gutter) 0 / 1px 100% no-repeat,
+    linear-gradient(var(--nc-math-tint), var(--nc-math-tint)) 0 0 / var(--nc-math-gutter) 100% no-repeat,
+    var(--nc-math-surface);
+  transition: border-color var(--nc-med) var(--nc-ease),
+              box-shadow var(--nc-med) var(--nc-ease);
+}
+mjx-container[display='true']:hover {
+  border-color: var(--nc-math-ring-hover);
+  box-shadow: 0 0 0 3px var(--nc-glow);
+}
+
+/* The arrow: crisp SVG, accent coloured, centred in the gutter */
+mjx-container[display='true']::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--nc-math-gutter) / 2);
+  top: 50%;
+  width: 1.25em;
+  height: 1.25em;
+  background-color: var(--text-accent);
+  -webkit-mask: var(--nc-ic-math-arrow) center / contain no-repeat;
+  mask: var(--nc-ic-math-arrow) center / contain no-repeat;
+  transform: translate(-50%, -50%);
+  opacity: 0.8;
+  pointer-events: none;
+  transition: transform var(--nc-med) var(--nc-ease), opacity var(--nc-fast);
+}
+mjx-container[display='true']:hover::before {
+  transform: translate(calc(-50% + 3px), -50%);
+  opacity: 1;
+}
+
+/* The equation itself: left aligned, scrolls sideways when too wide.
+   Soft edge shadows appear only when there is more to scroll to. */
+mjx-container[display='true'] > mjx-math {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0 !important;
+  padding: 0.4em 0.3em !important;    /* room so tall glyphs never clip */
+  text-align: left !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  background-image:
+    linear-gradient(to right, var(--nc-math-surface) 30%, transparent),
+    linear-gradient(to left, var(--nc-math-surface) 30%, transparent),
+    radial-gradient(farthest-side at 0 50%, var(--nc-math-fade), transparent),
+    radial-gradient(farthest-side at 100% 50%, var(--nc-math-fade), transparent);
+  background-position: left center, right center, left center, right center;
+  background-repeat: no-repeat;
+  background-size: 1.4em 100%, 1.4em 100%, 0.7em 100%, 0.7em 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+mjx-container[display='true'] > mjx-math::-webkit-scrollbar { height: 6px; }
+mjx-container[display='true'] > mjx-math::-webkit-scrollbar-thumb { border-width: 1px; }
+
+/* Block math inside table cells: compact, so tables stay readable */
+.markdown-rendered td mjx-container[display='true'],
+.markdown-rendered th mjx-container[display='true'] {
+  margin: 0.3em 0 !important;
+}
+
+/* ---------------------------------------------------------------------
+   INLINE MATH — soft pill, lights up on hover
+   --------------------------------------------------------------------- */
+mjx-container:not([display='true']) {
+  display: inline-block;
+  vertical-align: baseline;
+  box-sizing: border-box;
+  font-size: var(--nc-math-inline-size);
+  line-height: 1.15;                 /* sets the pill height: one tidy line, not a tall box */
+  margin-inline: 0.16em;
+  padding: 0.05em 0.4em;
+  border-radius: 0.45em;
+  background-color: var(--nc-math-pill);
+  box-shadow: inset 0 0 0 1px var(--nc-math-ring);
+  transition: background-color var(--nc-fast), box-shadow var(--nc-fast);
+}
+mjx-container:not([display='true']):hover {
+  background-color: var(--nc-math-pill-hover);
+  box-shadow: inset 0 0 0 1px var(--nc-math-ring-hover);
+}
+
+/* Headings and titles: plain math, no pill */
+:is(h1, h2, h3, h4, h5, h6, .inline-title, .callout-title) mjx-container:not([display='true']) {
+  padding: 0;
+  margin-inline: 0;
+  line-height: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* ---------------------------------------------------------------------
+   EDITING — the raw LaTeX source
+   --------------------------------------------------------------------- */
+.cm-math,
+.cm-s-obsidian span.cm-math {
+  font-family: var(--font-monospace);
+  font-size: 0.94em;
+  font-variant-ligatures: none;
+  color: var(--text-accent);
+}
+.cm-formatting-math,
+.cm-s-obsidian span.cm-formatting-math { color: var(--text-faint); }
+
+/* LaTeX errors */
+mjx-container mjx-merror {
+  padding: 0.1em 0.4em;
+  border-radius: var(--radius-s);
+  color: var(--link-unresolved-color);
+  background: color-mix(in srgb, var(--link-unresolved-color) 10%, transparent);
+  font-family: var(--font-monospace) !important;
+}
+
+/* If glyphs ever look shifted up or down on your machine, uncomment this:
+mjx-container mjx-c::before { line-height: normal !important; }
+*/
 
 /* =====================================================================
    9. CALLOUTS & PROPERTIES
